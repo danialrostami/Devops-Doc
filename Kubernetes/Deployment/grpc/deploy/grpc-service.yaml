@@ -1,0 +1,29 @@
+# API version for Service objects
+apiVersion: v1
+
+# Type of Kubernetes resource
+kind: Service
+
+# Service metadata
+metadata:
+  # Service name (DNS resolvable)
+  name: grpc-service
+
+# Service specification
+spec:
+  # Selects pods with these labels
+  selector:
+    # Must match pod labels from Deployment
+    app: grpc-app
+
+  # Network port configuration
+  ports:
+  - # Protocol (TCP/UDP)
+    protocol: TCP
+    # Port exposed by the Service
+    port: 50051
+    # Target port on pods
+    targetPort: 50051
+
+  # Service type (ClusterIP=internal-only)
+  type: ClusterIP

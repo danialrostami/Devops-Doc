@@ -1,0 +1,79 @@
+# API version for Deployment objects
+apiVersion: apps/v1
+
+# Type of Kubernetes resource
+kind: Deployment
+
+# Metadata for the Deployment
+metadata:
+  # Name of the Deployment
+  name: grpc-deployment
+
+# Specification of the Deployment's behavior
+spec:
+  # Number of identical pod replicas to maintain
+  replicas: 2
+
+  # Label selector to identify managed pods
+  selector:
+    matchLabels:
+      # Pods must have this label to be managed
+      app: grpc-app
+
+  # Template for creating pod replicas
+  template:
+    # Pod metadata
+    metadata:
+      # Labels attached to the pod
+      labels:
+        app: grpc-app
+
+    # Pod specification
+    spec:
+      # List of containers in the pod
+      containers:
+      - # Container name (appears in logs)
+        name: grpc-container
+
+        # Docker image to use
+        image: your-grpc-image:latest
+
+        # Ports to expose from container
+        ports:
+        - # gRPC default port
+          containerPort: 50051
+
+        # Health check to detect crashed containers
+        livenessProbe:
+          # gRPC-specific health check
+          grpc:
+            # Port where gRPC server listens
+            port: 50051
+          # Wait 5 seconds before first check
+          initialDelaySeconds: 5
+          # Check every 10 seconds
+          periodSeconds: 10
+
+        # Health check to detect ready-to-serve status
+        readinessProbe:
+          grpc:
+            port: 50051
+          # Faster initial check than liveness
+          initialDelaySeconds: 2
+          # Check every 5 seconds
+          periodSeconds: 5
+
+        # Resource requirements/limits
+        resources:
+          # Minimum resources guaranteed
+          requests:
+            # 0.1 CPU core
+            cpu: "100m"
+            # 128MB RAM
+            memory: "128Mi"
+          # Maximum allowed resources
+          limits:
+            # 0.5 CPU core
+            cpu: "500m"
+            # 512MB RAM
+            memory: "512Mi"
