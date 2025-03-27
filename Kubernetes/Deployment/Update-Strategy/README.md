@@ -58,12 +58,18 @@ Kubernetes provides robust update strategies to manage application deployments w
    New Deployment manifest with image v2 applied
 
 3. **Update Process**:
-   ```mermaid
-   graph LR
-     A[v1 Pod] -->|Terminate| B[ ]
-     B --> C[v2 Pod]
-     D[v1 Pod] -->|Terminate| E[ ]
-     E --> F[v2 Pod]
+
+```mermaid
+graph TD
+    A[Initial State: 3 Pods v1] --> B[Terminate 1 Pod v1]
+    B --> C[Create 1 Pod v2]
+    C --> D[State: 2v1 + 1v2]
+    D --> E[Terminate 1 Pod v1]
+    E --> F[Create 1 Pod v2]
+    F --> G[State: 1v1 + 2v2]
+    G --> H[Terminate last Pod v1]
+    H --> I[Create final Pod v2]
+    I --> J[Final State: 3 Pods v2]
 ---
 **Configuration Parameters -> RollingUpdate**
 
