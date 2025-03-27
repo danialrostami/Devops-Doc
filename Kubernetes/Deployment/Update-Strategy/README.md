@@ -66,7 +66,7 @@ Kubernetes provides robust update strategies to manage application deployments w
 
     C --> D[Complete: ⚪🟣🟣→🟣🟣🟣]
 
----
+```
 **Configuration Parameters -> RollingUpdate**
 
 ```yaml
