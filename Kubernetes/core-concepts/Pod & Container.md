@@ -167,6 +167,99 @@ spec:
   ```sh
   kubectl describe pod my-pod | grep "Restart Count"
   ```
+  ---
+  ## Network Communication in Pods
+
+### Intra-Pod Communication (Same Pod)
+Containers within the same Pod share the same network namespace:
+
+```mermaid
+graph LR
+    subgraph PodA
+        C1[Web Server] -->|localhost:8080| C2[Log Agent]
+        C2 -->|localhost:9000| C3[Cache]
+    end
+```
+### Key Characteristics:
+
+- All containers share one IP address
+
+- Communicate via localhost (no NAT)
+
+- Ports must not conflict between containers
+
+- Uses loopback interface (127.0.0.1)
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: multi-container
+spec:
+  containers:
+  - name: web
+    image: nginx
+    ports:
+    - containerPort: 80
+  - name: log-agent
+    image: fluentd
+    # Connects to nginx via localhost:80
+```
+### Inter-Pod Communication (Different Pods)
+Pods communicate across the cluster using Kubernetes networking:
+#### Methods:
+##### 1. Pod IPs (Direct but ephemeral)
+```bash
+kubectl get pods -o wide  # Shows Pod IPs
+```
+#### 2.Services (Recommended):
+```mermaid
+graph LR
+    FrontendPod -->|nginx-service:8080| Service -->|Load Balancer| BackendPods
+```
+  -  Stable ClusterIP (virtual IP)
+  -  DNS resolution: service-name.namespace.svc.cluster.local
+
+#### 3.Headless Services (Direct Pod access):
+```yaml
+kind: Service
+spec:
+  clusterIP: None # Creates DNS records for each Pod
+```
+
+###  Kubernetes Networking Models
+
+
+| Model               | How It Works                  | When To Use                  |
+|---------------------|-------------------------------|------------------------------|
+| **Same-Pod**        | `localhost` communication     | Sidecar containers           |
+| **Pod-to-Pod**      | CNI-provided cluster network  | Direct Pod communication     |
+| **Pod-to-Service**  | kube-proxy virtual IP         | Service discovery           |
+| **External Access** | Ingress/LoadBalancer          | Public-facing services      |
+
+#### Key Points
+
+- **Same-Pod Comms**: Fastest (localhost), shared network namespace
+- **Cluster Networking**: 
+  - Requires CNI plugin (Calico/Flannel)
+  - Pods get unique cluster IPs
+- **Services**:
+  - Stable endpoints for dynamic Pods
+  - Automatic load balancing
+- **External Access**:
+  - LoadBalancer: Cloud-native external IP
+  - Ingress: HTTP/S routing
+  - NodePort: Direct node access
+
+> **Pro Tip**: Use `kubectl get endpoints` to verify Service-to-Pod mappings
+```bash
+# Check DNS resolution
+kubectl exec -it mypod -- nslookup redis-service
+
+# Test connectivity
+kubectl exec -it mypod -- curl http://backend:8080
+```
+---
 
 
 
