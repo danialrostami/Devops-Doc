@@ -48,9 +48,9 @@ Advanced method for managing multiple configuration files in a directory structu
 
 How it works:
 
-    - Store related manifests in a directory
+  - Store related manifests in a directory
 
-    - Apply all configurations together
+  - Apply all configurations together
 
 Example Directory Structure:
 
@@ -73,11 +73,11 @@ Helm is Kubernetes' package manager that simplifies deployment of complex applic
 
 Key Features:
 
-    - Uses "Charts" (pre-configured application packages)
+  - Uses "Charts" (pre-configured application packages)
 
-    - Manages dependencies and configurations
+  - Manages dependencies and configurations
 
-    - Ideal for production environments
+  - Ideal for production environments
 
 ---
 ### Kubernetes Manifest Structure
@@ -89,9 +89,9 @@ Specifies which API version to use.
 
 Examples:
 
-    Pod: v1
+  * Pod: v1
 
-    Deployment: apps/v1
+  * Deployment: apps/v1
 
 #### 2. kind
 
@@ -99,11 +99,11 @@ Defines the type of resource to create.
 
 Examples:
 
-    Pod
+  * Pod
 
-    Deployment
+  * Deployment
 
-    Service
+  * Service
 
 #### 3. metadata
 
@@ -111,13 +111,13 @@ Contains identifying information.
 
 Required:
 
-    name: Unique identifier for the object
+  * name: Unique identifier for the object
 
 Optional:
 
-    labels: For categorization
+  * labels: For categorization
 
-    annotations: Additional metadata
+  * annotations: Additional metadata
 
 #### 4. spec
 
@@ -180,4 +180,6 @@ Choose the right management approach:
 | **Imperative**      | Direct CLI Commands  | Quick tests, learning, troubleshooting          | Fast execution, simple one-off commands   | Not reproducible, hard to track changes  | `kubectl run nginx --image=nginx:latest` |
 | **Declarative**     | YAML Manifests       | Production environments, CI/CD pipelines        | Version controllable, reproducible       | More initial setup required               | `kubectl apply -f deployment.yaml`       |
 | **Package Manager** | Helm Charts          | Complex applications with multiple components   | Handles dependencies, templating, versions | Learning curve, additional tooling needed | `helm install my-app ./chart`            |
+
+
 
