@@ -1,3 +1,84 @@
+# StatefulSet in Kubernetes: A Technical Deep Dive
+
+A StatefulSet is a Kubernetes workload API object designed to manage stateful applications (e.g., databases, messaging systems) that require persistent storage and stable network identities.
+
+## Key Features
+
+- **Stable Identifiers**: Pods are named sequentially (`pod-0`, `pod-1`, etc.)
+- **Ordered Operations**: Pods are created/scaled/deleted in a fixed order
+- **Data Persistence**: Uses PersistentVolumes (PVs) to retain data across pod rescheduling
+
+## Limitations of StatefulSets
+
+### 1. Dependency on Persistent Storage
+- Each pod requires a dedicated PersistentVolumeClaim (PVC)
+
+### 2. Sequential Operations
+- Pods are created/deleted in order (`pod-0` → `pod-1` → ...)
+
+### 3. No Built-in Load Balancing
+- Traffic is not distributed across pods by default
+
+### 4. Slow Scaling
+- Scaling up requires provisioning new PVs
+- *Optimization*: Use StorageClass with dynamic provisioning
+
+---
+## Headless Service
+
+**Purpose**: Direct pod-to-pod communication (bypasses kube-proxy load balancing)
+
+**Features**:
+- No cluster IP; DNS records resolve to individual pod IPs
+- Enables stateful application coordination (e.g., leader election, replication)
+
+```yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgresql-headless
+spec:
+  clusterIP: None
+  selector:
+    app: postgresql
+  ports:
+    - port: 5432
+
+```
+---
+
+## StatefulSet Configuration
+
+### Pod Management Policies
+
+| Policy               | Behavior                                      | Use Case                              |
+|----------------------|-----------------------------------------------|---------------------------------------|
+| `OrderedReady` (default) | Pods created/deleted sequentially (e.g., `pod-0` → `pod-1`) | Databases requiring ordered scaling |
+| `Parallel`           | Pods created/deleted concurrently             | Stateless apps with PVs              |
+
+### Update Strategies
+
+#### 1. RollingUpdate
+- Updates pods sequentially (controlled by `partition`)
+- **Example**: `partition=2` updates only pods with index ≥2 (`pod-2`, `pod-3`, etc.)
+
+```yaml
+updateStrategy:
+  type: RollingUpdate
+  rollingUpdate:
+    partition: 2  # Only updates pod-2, pod-3, ...
+```
+
+#### 2. OnDelete
+
+- Updates occur only when pods are manually deleted
+- **Risk**: Potential downtime
+
+```yaml
+updateStrategy:
+  type: OnDelete
+```
+---
 ## PostgreSQL HA Cluster on Kubernetes (StatefulSet)
 
 ### Architecture Overview
@@ -25,6 +106,7 @@ graph TD
       resources:
         requests:
           storage: 10Gi
+  ```
 
 ### Updates
 
