@@ -234,6 +234,24 @@ External User
 | Port: 8080          |    | Port: 8080          |
 +---------------------+    +---------------------+
 ```
+### ingress Class
+IngressClass is like a "label" that tells Kubernetes which Ingress Controller should handle a particular Ingress resource.
+
+**When do you need it?**
+- You have **multiple Ingress Controllers** in your cluster (e.g., Nginx + Traefik)
+- You want to **specify which controller** should manage certain Ingress rules
+
+**How to define:**
+```yaml
+apiVersion: networking.k8s.io/v1
+kind: IngressClass
+metadata:
+  name: nginx-ingress-class
+spec:
+  controller: k8s.io/ingress-nginx
+```
+---> Now You can use This ingress class(nginx-ingress-class) in ingress resource.
+
 ### Example ingrees rule YAML
 ```yaml
 apiVersion: networking.k8s.io/v1
