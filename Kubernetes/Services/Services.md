@@ -448,7 +448,30 @@ graph LR
     style Pod1 fill:#e8f5e9,stroke:#2e7d32
     style Pod2 fill:#e8f5e9,stroke:#2e7d32
 ```
-**How They Connect**
+```yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx-service
+spec:
+  selector:
+    app: nginx
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 80
+  externalIPs:
+  - 192.168.1.100
+```
+### How Works ?
+When a request is made to an external IP (e.g., 192.168.1.100) on port 80:
+
+- **Request Routing**:
+  - Kubernetes directs the incoming request to the `nginx-service` Service
+- **Load Balancing**:
+  - The Service forwards the request to one of the available Nginx Pods (using built-in load balancing)
+
+**How Internal and External IP Connect**
 
 - Entry Point: External traffic hits the External IP
 - Routing: kube-proxy directs to ClusterIP Service
