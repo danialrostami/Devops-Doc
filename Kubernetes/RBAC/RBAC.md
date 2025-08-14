@@ -141,6 +141,11 @@ roleRef:
   name: pod-reader
   apiGroup: rbac.authorization.k8s.io
 ```
+This configuration file creates a binding that:
+- **Connects** the `pod-reader` Role 
+- **To** the ServiceAccount `dani-sa` 
+- **Within** the `team-a` namespace
+  
 ### Step 4: Retrieve Authentication Token
 
 Get the JWT token for the ServiceAccount:
