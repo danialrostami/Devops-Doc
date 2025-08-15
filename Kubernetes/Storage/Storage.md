@@ -67,6 +67,48 @@ kubectl get storageclass
 kubectl exec <pod> -- df -h
 ```
 ---
+## Volume:
+A **Volume** in Kubernetes is an attached storage unit that provides containers with:
+- Persistent storage beyond container lifecycle
+- Shared storage between containers in a pod
+- Access to various storage backends
+
+## PV:
+A PersistentVolume (PV) is a durable storage resource in Kubernetes that exists independently of pods.
+
+```mermaid
+graph LR
+    A[PV] -->|Claimed by| B[Pod]
+    A -->|Stores| C[Persistent Data]
+    B -.->|Terminated| D[Data Remains]
+```
+### PV Storage Engine Connections
+
+#### Two Connection Methods
+
+| Method               | Description                                                                 | When to Use                      |
+|----------------------|-----------------------------------------------------------------------------|----------------------------------|
+| **Direct Connection** | Manually connect PV to specific storage (local disk, NFS, etc.)            | - Pre-existing storage<br>- Special requirements<br>- Small clusters |
+| **Provisioner**      | Automatically provision storage via StorageClass (AWS EBS, GCP Disk, etc.)  | - Cloud environments<br>- Dynamic workloads<br>- Large clusters |
+
+`What is a Provisioner?`
+
+A Provisioner is a Kubernetes component that automatically creates storage volumes when needed.
+
+#### Kubernetes Provisioning Methods Comparison
+
+| Feature                | Static Provisioning                                      | Dynamic Provisioning                                   |
+|------------------------|---------------------------------------------------------|-------------------------------------------------------|
+| **Definition**         | Admin manually creates PVs in advance                   | Kubernetes automatically creates PVs when needed      |
+| **Management**         | Manual PV lifecycle management                          | Automatic PV lifecycle management                     |                              |
+| **Best For**          | Environments with predictable storage needs             | Cloud environments with dynamic storage requirements  |                                      |
+| **Speed**             | Slower (manual process)                                | Faster (on-demand)                                    |
+| **Storage Backends**  | Works with any backend                                  | Requires provisioner-supported backend               |
+| **Example Use Case**  | On-prem NFS with fixed capacity                        | AWS EBS volumes for dynamic workloads                |                                   |
+| **Pros**             | Full control over PV config, Works with any storage system | Automatic scaling, Faster Deployment                            |
+
+---
+
 ## - Kubernetes ConfigMap 
 
 ConfigMap is a Kubernetes resource that lets you decouple configuration from container images, making applications more portable. It stores non-confidential data in key-value pairs that can be:
