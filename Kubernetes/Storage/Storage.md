@@ -66,4 +66,171 @@ kubectl get storageclass
 ```
 kubectl exec <pod> -- df -h
 ```
+---
+## - Kubernetes ConfigMap 
+
+ConfigMap is a Kubernetes resource that lets you decouple configuration from container images, making applications more portable. It stores non-confidential data in key-value pairs that can be:
+
+ConfigMaps provide two main configuration approaches:
+1. **Key-Value Pairs**: Simple environment variables
+2. **Configuration Files**: Complex structured data
+
+### Feature Comparison 
+
+| Feature                | Environment Variables                     | Configuration Files                  |
+|------------------------|------------------------------------------|--------------------------------------|
+| **Best For**           | Simple key-value pairs                   | Complex configurations (JSON/YAML)   |
+| **Implementation**     | Injected into container environment     | Mounted as volumes                   |
+| **Update Behavior**    | Requires pod restart                     | Auto-refresh possible                |
+| **Usage Example**      | DB connection strings                    | Nginx/Apache configs                 |
+| **Security**          | Visible in pod description               | Protected as mounted files           |
+| **Modification**      | Must recreate pod                        | Can use auto-reload sidecars         |
+| **K8s Manifest**      | `envFrom`/`valueFrom`                   | `volumes` + `volumeMounts`          |
+| **Version Control**   | Limited (embedded in manifests)         | Full Git history support             |
+| **Secret Handling**   | Requires Kubernetes Secrets             | Can use Secrets as volume mounts     |
+
+### Example 1: Key-Value ConfigMap:
+#### 1. ConfigMap Definition
+```yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: app-config
+data:
+  APP_MODE: production
+  APP_PORT: "8080"
+```
+#### 2. Pod Using ConfigMap as Env Vars
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: app-pod
+spec:
+  containers:
+  - name: app-container
+    image: nginx:latest
+    env:
+    - name: APP_MODE
+      valueFrom:
+        configMapKeyRef:
+          name: app-config
+          key: APP_MODE
+    - name: APP_PORT
+      valueFrom:
+        configMapKeyRef:
+          name: app-config
+          key: APP_PORT
+```
+When the pod starts running:
+- The values `APP_MODE` and `APP_PORT` will be set as environment variables inside the container
+#### 3. Verification
+```yaml
+kubectl exec -it app-pod -- env | grep APP_
+```
+```
+APP_MODE=production
+APP_PORT=8080
+```
+---
+### Example 2: File-Based ConfigMap
+#### 1. ConfigMap with JSON File
+```yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: app-config-file
+data:
+  config.json: |
+    {
+      "mode": "production",
+      "port": 8080
+    }
+```
+#### 2. Pod Mounting ConfigMap as File
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: app-pod-file
+spec:
+  containers:
+  - name: app-container
+    image: nginx:latest
+    volumeMounts:
+    - name: config-volume
+      mountPath: /etc/config
+  volumes:
+  - name: config-volume
+    configMap:
+      name: app-config-file
+```
+When the pod launches:
+- The `config.json` file will be mounted at `/etc/config/config.json` inside the container
+- This occurs through Kubernetes' volume mounting system
+#### 3. Verification
+```
+kubectl exec -it app-pod-file -- cat /etc/config/config.json
+```
+```
+{
+  "mode": "production",
+  "port": 8080
+}
+```
+### Troubleshooting 
+```yaml
+# Verify ConfigMap exists
+kubectl get configmaps  
+
+# View ConfigMap contents
+kubectl describe configmap <name>
+
+# Check environment variables in pod
+kubectl exec <pod> -- env
+
+# Check mounted config files
+kubectl exec <pod> -- ls /path/to/mount
+```
+---
+## - Kubernetes Secret
+Secrets are Kubernetes objects designed to store and manage sensitive information including:
+
+- **Credentials**: Database passwords, API keys
+- **Certificates**: TLS/SSL certificates
+- **Tokens**: Authentication tokens, SSH keys
+- 
+### Kubernetes Secret Types
+
+| Secret Type                      | Primary Use Case                                                                 | Data Format                     | Auto-Managed | Example Fields                          |
+|----------------------------------|----------------------------------------------------------------------------------|---------------------------------|--------------|-----------------------------------------|
+| **Opaque**                       | General-purpose secrets (default type)                                           | Key-value pairs                 | No           | `password`, `api-key`                   |
+| **kubernetes.io/tls**            | TLS certificates for HTTPS                                                       | PEM-encoded files               | No           | `tls.crt`, `tls.key`                    |
+| **kubernetes.io/dockerconfigjson** | Docker registry authentication credentials                                       | JSON config file                | No           | `.dockerconfigjson`                     |
+| **kubernetes.io/basic-auth**     | Basic authentication credentials                                                 | Plaintext username/password     | No           | `username`, `password`                  |
+| **kubernetes.io/ssh-auth**       | SSH private keys for secure connections                                          | PEM-encoded key                 | No           | `ssh-privatekey`                        |
+| **kubernetes.io/service-account-token** | Kubernetes API access tokens                                                  | JWT token                       | Yes          | `token`, `ca.crt`, `namespace`          |
+| **Custom Types**                 | Specialized secret formats                                                       | Varies by implementation        | No           | Depends on custom controller            |
+
+#### Opaque Secret:
+```yaml
+apiVersion: v1
+kind: Secret
+metadata:
+  name: db-secret
+type: Opaque
+data:
+  username: YWRtaW4=  # base64 encoded
+  password: MWYyZDFlMmU2N2Rm
+```
+### Troubleshooting 
+```yaml
+# Verify your secret appears in the list
+kubectl get secrets
+
+# Shows metadata but NOT the encoded values
+kubectl describe secret <secret-name>
+```
+---
+```
 
