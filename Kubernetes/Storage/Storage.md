@@ -48,25 +48,7 @@ A storage engine is software that handles data storage, management, and retrieva
 | **In-Memory**      | Data stored in RAM               | Caching, real-time systems        | Ultra-fast access                 | Volatile, expensive               |
 | **Distributed**    | Data spread across multiple nodes | Cloud systems, big data         | Fault-tolerant, scalable          | Complex to implement              |
 ---
-### Troubleshooting
-#### Check PVC status
-```
-kubectl get pvc
-```
-#### View PV details
-```
-kubectl describe pv <pv-name>
-```
 
-#### Check storage classes
-```
-kubectl get storageclass
-```
-#### View mounted volumes in pod
-```
-kubectl exec <pod> -- df -h
-```
----
 ## Volume:
 A **Volume** in Kubernetes is an attached storage unit that provides containers with:
 - Persistent storage beyond container lifecycle
@@ -78,9 +60,9 @@ A PersistentVolume (PV) is a durable storage resource in Kubernetes that exists 
 
 ```mermaid
 graph LR
-    A[PV] -->|Claimed by| B[Pod]
-    A -->|Stores| C[Persistent Data]
-    B -.->|Terminated| D[Data Remains]
+    A[Pod] -->|Mounts| B[PVC]
+    B -->|Bound to| C[PV]
+    C -->|Backed by| D[(Storage)]
 ```
 ### PV Storage Engine Connections
 
@@ -106,7 +88,109 @@ A Provisioner is a Kubernetes component that automatically creates storage volum
 | **Storage Backends**  | Works with any backend                                  | Requires provisioner-supported backend               |
 | **Example Use Case**  | On-prem NFS with fixed capacity                        | AWS EBS volumes for dynamic workloads                |                                   |
 | **Pros**             | Full control over PV config, Works with any storage system | Automatic scaling, Faster Deployment                            |
+---
+- ### PV Sample Manifest:
 
+```yaml
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: pv0003               # PV name for identification in the cluster
+spec:
+  capacity:
+    storage: 5Gi             # Storage capacity allocated (5 Gibibytes)
+  
+  volumeMode: Filesystem     # Storage exposed as filesystem directory (alternative: Block for raw devices)
+  
+  accessModes:
+    - ReadWriteOnce
+    # Access mode: only one Pod can access this Persistent Volume simultaneously R/W permissions
+    # Other options: ReadOnlyMany, ReadWriteMany
+  
+  persistentVolumeReclaimPolicy: Recycle
+  # Data handling when PVC is released:
+  # Recycle (delete data and make PVs available for reuse), Retain (keep data), or Delete (remove volume)
+  
+  storageClassName: slow    # Classifies storage performance/type (helps match PVC requests)
+  
+  mountOptions:
+    - hard                  # NFS mount option: Retry requests until server responds
+    - nfsvers=4.1           # Forces NFS protocol version 4.1
+  
+  nfs:
+    path: /tmp              # Exported NFS server path (data stored here)
+    server: 172.17.0.2      # NFS server IP address
+```
+- ####  PV and Storage Engine Lifecycle
+
+| Lifecycle Stage  | Persistent Volume (PV)                          | Storage Engine                     |
+|------------------|------------------------------------------------|------------------------------------|
+| **Provisioning** | Manually (Static) or automatically (Dynamic)   | Admin/manual or system/auto setup  |
+| **Allocation**   | Bound to PVC for Pod usage                     | Allocated to apps/users            |
+| **Usage**        | Actively used by Pods for R/W operations       | Data R/W by applications           |
+| **Deallocation** | Released when PVC deleted (data persists)      | Storage freed for reuse            |
+| **Deletion**     | Depends on reclaim policy (Retain/Delete)      | Complete data/storage removal      |
+
+---
+### PVC:
+  Applications connect to PVs through PersistentVolumeClaims (PVCs). 
+
+#### PVC Practical Example:
+
+#### 1. PVC Definition:
+```yaml
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: my-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 5Gi
+```
+-  Kubernetes looks for PVs that: Have ≥5GB available, Support ReadWriteOnce, Match StorageClass,Are in "Available" state
+
+#### 2. Pod Using the PVC:
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: my-pod
+spec:
+  containers:
+    - name: my-container
+      image: nginx
+      volumeMounts:
+        - mountPath: "/usr/share/nginx/html"
+          name: my-storage
+  volumes:
+    - name: my-storage
+      persistentVolumeClaim:
+        claimName: my-pvc
+```
+- Mounts the PVC my-pvc to /usr/share/nginx/html in the container
+
+### Troubleshooting
+- #### Check PVC status
+```
+kubectl get pvc
+kubectl get pvc example-pvc -o wide
+```
+- #### View PV details
+```
+kubectl describe pv <pv-name>
+```
+
+- #### Check storage classes
+```
+kubectl get storageclass
+```
+- #### View mounted volumes in pod
+```
+kubectl exec <pod> -- df -h
+```
 ---
 
 ## - Kubernetes ConfigMap 
