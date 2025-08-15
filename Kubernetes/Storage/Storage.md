@@ -232,5 +232,5 @@ kubectl get secrets
 kubectl describe secret <secret-name>
 ```
 ---
-```
+
 
