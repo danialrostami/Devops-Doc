@@ -97,6 +97,9 @@ kubectl create namespace argocd
 kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
 ```
 #### 2. Configure Service Type
+**Default**: ArgoCD uses ClusterIP (internal cluster access only)  
+**Goal**: Enable external access  
+**Action**: Modify the `argocd-server` service configuration
 ```yaml
 kubectl patch svc argocd-server -n argocd -p '{"spec": {"type": "ClusterIP"}}'
 ```
