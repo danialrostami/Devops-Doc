@@ -138,3 +138,90 @@ kubectl create secret tls argocd-tls-secret \
   --key=cert.key \
   -n argocd
 ```
+---
+## Applications and Sync
+
+### Application Definition
+In ArgoCD, an **Application** defines what to deploy, from where, and how:
+- **Source**: Git repository URL, path, and revision (branch/tag)
+- **Destination**: Target cluster and namespace
+- **Tooling**: Deployment method (plain YAML, Helm, Kustomize, etc.)
+
+### Sync Operation
+**Sync** means reconciling the desired state (in Git) with the live state (in cluster):
+- **Manual Sync**: User-triggered deployment
+- **Auto Sync**: Automatic deployment when Git changes
+- **OutOfSync**: Status when live state differs from Git
+
+### Sample Application YAML
+```yaml
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: my-nginx
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/my-org/nginx-deploy
+    targetRevision: HEAD
+    path: manifests
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: default
+  syncPolicy:
+    automated:
+      prune: true          
+      selfHeal: true       
+```
+This application will:
+- **Source**: Deploy contents from the `manifests` folder in the GitHub repository
+- **Target**: Deploy to the `default` namespace in the Kubernetes cluster
+- **Revision**: Use the latest commit (`HEAD`) from the repository
+- **`prune: true`**: Automatically removes resources from the cluster if they are deleted from Git
+- **`selfHeal: true`**: Automatically reverts any manual changes made directly in the cluster back to the state defined in Git
+---
+## Git Repository Configuration
+
+- **Public Repos**: No credentials needed
+
+- **Private Repos**: Require SSH keys or HTTPS credentials
+
+### 1.SSH Connection (Recommended)
+```bash
+argocd repo add git@github.com:my-org/private-repo.git \
+  --ssh-private-key-path ~/.ssh/id_rsa
+```
+### 2.HTTPS Connection
+```bash
+argocd repo add https://github.com/my-org/myrepo.git \
+--username myuser \
+--password mytoken
+```
+---
+##  AppProject: Access Control in ArgoCD
+AppProject is a resource in kubernetes that restricts what applications can do:
+
+- **Namespace Restrictions**: Control which namespaces applications can deploy to
+- **Git Repository Whitelisting**: Specify allowed source Git repositories
+- **Cluster Access Management**: Define permitted target clusters
+- **RBAC Configuration**: Set team-specific role-based access control rules
+
+### Sample AppProject
+```yaml
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: dev-team
+  namespace: argocd
+spec:
+  sourceRepos:
+    - https://github.com/my-org/dev-repos/*   # Only repo located under the `dev-repos/` are permitted.
+  destinations:
+    - namespace: dev
+      server: https://kubernetes.default.svc
+  namespaceResourceBlacklist:
+    - group: ""
+      kind: Secret                                 # Prevent Secret creation
+```
+
