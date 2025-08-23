@@ -224,4 +224,75 @@ spec:
     - group: ""
       kind: Secret                                 # Prevent Secret creation
 ```
+---
+## ArgoCD Deployment Management
+
+### Overview
+ArgoCD automates Kubernetes deployments, providing control, visibility, and rollback capabilities.
+
+### Sync Modes
+### 🔧 Manual Sync
+- Changes in Git trigger **OutOfSync** status but require manual deployment
+- Trigger via CLI: `argocd app sync my-app`
+- Or use the Sync button in UI
+### 🤖 Auto Sync
+- Automatically deploys Git changes immediately
+- Enable in YAML:
+```yaml
+syncPolicy:
+  automated:
+    prune: true
+    selfHeal: true
+```
+### Sync Policy Features
+
+#### ✅ Automated
+Enables automatic deployment without manual intervention
+
+#### 🧹 Prune
+Removes cluster resources that were deleted from Git
+
+#### ♻️ Self-Heal
+Automatically reverts manual cluster changes to match Git state
+#
+### ArgoCD Status Monitoring
+
+| Status Type   | Status      | Description |
+|---------------|-------------|-------------|
+| Sync Status   | Synced      | Git state matches cluster state |
+|               | OutOfSync   | Differences exist between Git and cluster |
+| Health Status | Healthy     | All resources functioning properly |
+|               | Progressing | Resources being created or updated |
+|               | Degraded    | Problems exist in resources (e.g., CrashLoopBackOff) |
+|               | Missing     | Required resources not found in the cluster |
+
+- **Check Status**
+```bash
+argocd app get my-app
+```
+### 🔍 Comparison Tools
+View differences between Git and cluster states
+
+- UI: Use "Diff" button
+
+- CLI: `argocd app diff my-app`
+```
+- replicas: 2
++ replicas: 3
+```
+### ⏪ Rollback Capabilities
+**Revision History**
+
+  - ArgoCD maintains complete deployment history
+
+  - Each sync creates a new revision (using Git commit hash)
+
+**Rollback Methods**
+- **UI**: Application → History → Select previous version → Rollback
+- **CLI**
+```yaml
+argocd app history my-app
+argocd app rollback my-app <revision-id>
+```
+---
 
