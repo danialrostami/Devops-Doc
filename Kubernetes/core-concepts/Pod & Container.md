@@ -67,18 +67,33 @@ sequenceDiagram
 ### Example 
 
 ```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: simple-working-pod
 spec:
+  volumes:
+    - name: shared-dir
+      emptyDir: {}
+
   initContainers:
-  - name: config-downloader
-    image: busybox
-    command: ['wget', 'https://configs/app.yaml', '-O', '/config/app.yaml']
-  containers:
-  - name: app
-    image: my-app
+  - name: init-setup
+    image: docker.arvancloud.ir/busybox
+    command: ["sh", "-c", "echo 'File created by init container' > /shared/data.txt"]
     volumeMounts:
-    - name: config
-      mountPath: /config
+    - name: shared-dir
+      mountPath: /shared
+
+  containers:
+  - name: main-app
+    image:  docker.arvancloud.ir/alpine
+    command: ["sh", "-c", "echo 'Main container started' && cat /shared/data.txt && sleep 9999"]
+    volumeMounts:
+    - name: shared-dir
+      mountPath: /shared
+
 ```
+- **kubectl exec -it pods/simple-working-pod -n devops -- cat /shared/data.txt**
 ---
 ## Pod Lifecycle
 
