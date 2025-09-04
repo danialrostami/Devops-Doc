@@ -222,6 +222,8 @@ Mechanisms to check container health states:
 - **Liveness**: Is the container running? (Restarts if unhealthy)
 - **Readiness**: Is it ready to serve traffic? (Removes from service if not)
 - **Startup**: Did the app start successfully? (Terminates if startup fails)
+- **Critical Role in deployment:**
+  During an update, Kubernetes waits for the new pod to reach a Running state, then immediately terminates the old pod. This process can cause  applicationdowntime if the new pod's internal application has not finished initializing (e.g., loading data, connecting to dependencies) and is not yet ready to serve traffic.
 
 ##### Probe Types & Use Cases
 | Type         | Action on Failure               | When to Use                          |         Purpose        |
