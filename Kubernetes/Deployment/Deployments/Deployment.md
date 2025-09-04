@@ -420,6 +420,7 @@ For output: `60%/50%  2   10  3`
 #### 6. Kubernetes Deployment Pause/Unpause
 
 ##### Overview
+- When a Deployment is paused, Kubernetes will accept new changes but postpone rolling them out until you unpause it.
 - **Pause**: Temporarily stops a deployment rollout.
 - **Unpause**: Resumes a paused rollout.
 
