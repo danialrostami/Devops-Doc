@@ -442,11 +442,12 @@ For output: `60%/50%  2   10  3`
 
 ##### Workflow Example
 1. Pause deployment
-2. Apply changes (won't deploy)
+2. Apply changes 
 ```
 kubectl set image deployment/nginx-deployment nginx=nginx:1.23
 deployment.apps/nginx-deployment image updated
 ```
+- or change depolyment.yml and apply it `kubectl apply -f deployment.tml -n <namespace>`
 3. Test/verify changes
 4. Unpause to deploy
 5. Monitor rollout status
