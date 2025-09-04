@@ -346,16 +346,24 @@ Automatically scale Pods between 2-10 replicas when CPU usage exceeds 50%.
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: web-app
+  name: nginx-deployment
 spec:
   replicas: 2
+  selector:
+    matchLabels:
+      app: nginx
   template:
+    metadata:
+      labels:
+        app: nginx
     spec:
       containers:
       - name: app
-        image: nginx
+        image: nginx:latest
         resources:
-          requests: { cpu: "250m" }  # Required for HPA
+          requests:
+            cpu: "250m"
+
 ```
 2. #### HPA (hpa.yaml)
 ```yaml
@@ -367,9 +375,9 @@ spec:
   scaleTargetRef:
     apiVersion: apps/v1
     kind: Deployment
-    name: web-app
+    name: nginx-deployment
   minReplicas: 2
-  maxReplicas: 10
+  maxReplicas: 6
   metrics:
   - type: Resource
     resource:
