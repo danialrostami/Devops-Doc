@@ -168,6 +168,169 @@ NAME                                     STATUS     COMPLETIONS   DURATION   AGE
 job.batch/ansible-awx-migration-24.6.1   Complete   1/1           2m25s      23m
 ```
 ---
+## AWX Architecture - Complete Breakdown
+
+### 📦 PODS (Running Containers)
+
+#### 1. **ansible-awx-migration-24.6.1-5sbq6** ✅ *COMPLETED*
+
+-   **Type:** One-time Job Pod
+-   **Status:** Completed (ran successfully and finished)
+-   **Purpose:** Database setup and schema migrations
+-   **Analogy:** The construction crew that set up the database tables
+-   **Why Completed:** It did its job (database setup) and exited
+
+------------------------------------------------------------------------
+
+#### 2. **ansible-awx-postgres-15-0** 🗄️ *RUNNING*
+
+-   **Type:** Database Pod (StatefulSet)
+-   **Status:** Running (1/1 ready)
+-   **Purpose:** PostgreSQL database storing **ALL AWX data**
+-   **Stores:** Users, inventories, job history, credentials, playbooks
+-   **Why StatefulSet:** Data persists even if pod restarts
+
+------------------------------------------------------------------------
+
+#### 3. **ansible-awx-task-5b8d47c9-9m6v9** ⚡ *RUNNING*
+
+-   **Type:** Task Execution Pod (4 containers)
+-   **Status:** Running (4/4 ready)
+-   **Purpose:** Runs Ansible playbooks and jobs
+-   **Containers:**
+    -   Main task runner
+    -   Redis (cache + message broker)
+    -   Support containers
+-   **Analogy:** The "kitchen staff" that cooks (executes playbooks)
+
+------------------------------------------------------------------------
+
+#### 4. **ansible-awx-web-7b4c6655d6-9phn8** 🌐 *RUNNING*
+
+-   **Type:** Web Interface Pod (3 containers)
+-   **Status:** Running (3/3 ready)
+-   **Purpose:** Web UI and REST API
+-   **Containers:**
+    -   nginx (web server)
+    -   awx-web (Django application)
+    -   redis (caching)
+-   **Analogy:** The "restaurant front" where customers interact
+
+------------------------------------------------------------------------
+
+#### 5. **awx-operator-controller-manager-7946d576c9-wk4cq** 🎮 *RUNNING*
+
+-   **Type:** Operator Pod (2 containers)
+-   **Status:** Running (2/2 ready)
+-   **Purpose:** Manages and watches AWX instances
+-   **Containers:**
+    -   kube-rbac-proxy (authentication)
+    -   awx-manager (operator logic)
+-   **Analogy:** The "building manager" that maintains everything
+
+------------------------------------------------------------------------
+
+### 🌐 SERVICES (Network Access)
+
+#### 1. **ansible-awx-postgres-15**
+
+-   **Type:** ClusterIP
+-   **Port:** 5432
+-   **Purpose:** Internal service for database access
+-   **Access:** Only within Kubernetes cluster
+
+------------------------------------------------------------------------
+
+#### 2. **ansible-awx-service** 🚪 *YOUR ENTRY POINT*
+
+-   **Type:** NodePort
+-   **Port:** 80:30902
+-   **Purpose:** Web UI access
+-   **Access:** `http://192.168.49.2:30902`
+-   **Why NodePort:** Makes AWX accessible from outside Kubernetes
+
+------------------------------------------------------------------------
+
+#### 3. **awx-operator-controller-manager-metrics-service**
+
+-   **Type:** ClusterIP
+-   **Port:** 8443
+-   **Purpose:** Metrics and monitoring for operator
+
+------------------------------------------------------------------------
+
+### ⚙️ DEPLOYMENTS (Pod Managers)
+
+#### 1. **deployment.apps/ansible-awx-task**
+
+-   **Manages:** Task pods
+-   **Replicas:** 1
+-   **Purpose:** Ensures task runner is always available
+
+#### 2. **deployment.apps/ansible-awx-web**
+
+-   **Manages:** Web pods
+-   **Replicas:** 1
+-   **Purpose:** Ensures web interface is always available
+
+#### 3. **deployment.apps/awx-operator-controller-manager**
+
+-   **Manages:** Operator pods
+-   **Replicas:** 1
+-   **Purpose:** Ensures operator is always running
+
+------------------------------------------------------------------------
+
+### 🔄 REPLICASETS (Version Control for Pods)
+
+Each Deployment uses a ReplicaSet to manage pod versions:
+
+-   **ansible-awx-task-5b8d47c9** -- Manages task pod version
+-   **ansible-awx-web-7b4c6655d6** -- Manages web pod version
+-   **awx-operator-controller-manager-7946d576c9** -- Manages operator
+    pod version
+
+**Purpose:** Handle rolling updates and version tracking
+
+------------------------------------------------------------------------
+
+### 💾 STATEFULSET (Stateful Applications)
+
+#### **statefulset.apps/ansible-awx-postgres-15**
+
+-   **Manages:** Database pod
+-   **Why StatefulSet:**
+    -   Stable network identity
+    -   Persistent storage
+    -   Ordered deployment
+-   **Pod Naming:** `ansible-awx-postgres-15-0` (predictable)
+
+------------------------------------------------------------------------
+
+### 🎯 JOB (One-time Tasks)
+
+#### **job.batch/ansible-awx-migration-24.6.1**
+
+-   **Status:** Complete ✅
+-   **Completions:** 1/1
+-   **Duration:** 2m25s
+-   **Purpose:** Ran database migrations during setup
+
+------------------------------------------------------------------------
+
+### 🔄 How Data Flows Through AWX
+
+    User Request → ansible-awx-service (NodePort 30902)
+                        ↓
+               ansible-awx-web (Web UI/API)
+                        ↓
+               ansible-awx-task (Playbook Execution)
+                        ↓
+               Target Servers (via SSH/Ansible)
+                        ↑
+              ansible-awx-postgres-15 (Data Storage)
+
+---
 ### Configure Persistent Storage
 1. /opt/manifests/pv-awx-projects.yaml
 ```
