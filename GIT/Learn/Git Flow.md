@@ -80,11 +80,8 @@ flowchart LR
     H --> D
 ```
 
-### Complete Gitflow Integration
-
+### Gitflow Workflow Graph
 This diagram shows how feature, release, and hotfix branches interact within the Gitflow workflow.
-
-## Gitflow Workflow Graph
 
 ```mermaid
 flowchart TD
@@ -96,22 +93,23 @@ flowchart TD
         DEVELOP(develop)
     end
 
-    MAIN --> DEVELOP
+    MAIN -->|Start integration for new features| DEVELOP
 
-    DEVELOP --> F1[feature/feature1]
-    DEVELOP --> F2[feature/feature2]
-    F1 --> DEVELOP
-    F2 --> DEVELOP
+    DEVELOP -->|Develop new feature| F1[feature/feature1]
+    DEVELOP -->|Develop new feature| F2[feature/feature2]
+    F1 -->|Feature complete, merge back| DEVELOP
+    F2 -->|Feature complete, merge back| DEVELOP
 
-    DEVELOP --> RELEASE[release/1.0.0]
-    RELEASE --> MAIN
-    RELEASE --> DEVELOP
+    DEVELOP -->|Prepare release candidate| RELEASE[release/1.0.0]
+    RELEASE -->|Release finalized, merge to main| MAIN
+    RELEASE -->|Back-merge bugfixes or updates| DEVELOP
 
-    MAIN --> HOTFIX[hotfix/bugfix]
-    HOTFIX --> MAIN
-    HOTFIX --> DEVELOP
+    MAIN -->|Urgent fix needed in production| HOTFIX[hotfix/bugfix]
+    HOTFIX -->|Merge hotfix into production| MAIN
+    HOTFIX -->|Merge hotfix into integration branch| DEVELOP
 ```
 
+---
 **Branch Descriptions:**
 
 * `main` — Stores production-ready code and official releases.
