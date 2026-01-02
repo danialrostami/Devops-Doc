@@ -84,21 +84,32 @@ flowchart LR
 
 This diagram shows how feature, release, and hotfix branches interact within the Gitflow workflow.
 
+## Gitflow Workflow Graph
+
 ```mermaid
 flowchart TD
-    M[main]
-    D[develop]
-    F1[feature/login]
-    F2[feature/payment]
-    R[release/1.0.0]
-    H[hotfix/urgent-bug]
+    subgraph Production[Production]
+        MAIN(main)
+    end
 
-    D --> F1 --> D
-    D --> F2 --> D
-    D --> R --> M
-    R --> D
-    M --> H --> M
-    H --> D
+    subgraph Development[Development]
+        DEVELOP(develop)
+    end
+
+    MAIN --> DEVELOP
+
+    DEVELOP --> F1[feature/feature1]
+    DEVELOP --> F2[feature/feature2]
+    F1 --> DEVELOP
+    F2 --> DEVELOP
+
+    DEVELOP --> RELEASE[release/1.0.0]
+    RELEASE --> MAIN
+    RELEASE --> DEVELOP
+
+    MAIN --> HOTFIX[hotfix/bugfix]
+    HOTFIX --> MAIN
+    HOTFIX --> DEVELOP
 ```
 
 **Branch Descriptions:**
