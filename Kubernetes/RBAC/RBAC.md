@@ -213,7 +213,7 @@ users:
 1. Save the above configuration in a file named `config`
 2. Instruct user dani to copy this file to `~/.kube/config`:
 
-### Step7 : Verification Steps
+### Step9 : Verification Steps
 ```yaml
 # dani will be able to view the list of Pods in the team-a namespace.
 kubectl get pods -n team-a
