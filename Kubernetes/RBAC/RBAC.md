@@ -87,9 +87,9 @@ roleRef:
 ```
 ---
 # Practical Kubernetes RBAC Implementation
-
+This Sample explains how to set up RBAC in Kubernetes using a ServiceAccount with the necessary permissions, and how to generate a kubeconfig file for accessing the cluster using this ServiceAccount.
 ## Scenario Overview
-Create a user "dani" with read-only access to Pods in the `team-a` namespace.
+Grant "dani" user a read-only access to Pods in the `team-a` namespace.
 
 ```mermaid
 graph TD
