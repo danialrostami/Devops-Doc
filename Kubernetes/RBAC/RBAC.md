@@ -210,8 +210,8 @@ users:
    - Evaluates RBAC permissions  
 
 ### Step 8: Usage Instructions for User
-1. Save the above configuration in a file named `config`
-2. Instruct user dani to copy this file to `~/.kube/config`:
+1. Save the above configuration in a file named `kubeconfig`
+2. Instruct user dani to copy this file to `~/.kube/kubeconfig`:
 
 ### Step9 : Verification Steps
 ```yaml
@@ -219,7 +219,7 @@ users:
 kubectl get pods -n team-a
 
 # Test access
-kubectl --kubeconfig=dani-config get pods -n team-a
+kubectl --kubeconfig=/home/dani/.kube/kubeconfig get pods -n team-a
 
 # Verify permissions (should show only get/list/watch)
 kubectl auth can-i --as=system:serviceaccount:team-a:dani-sa list pods -n team-a
