@@ -108,8 +108,20 @@ kind: ServiceAccount
 metadata:
   name: dani-sa
   namespace: team-a
+secrets:
+- name: secret-sa-dani
 ```
-### Step 2: Define Role
+### Step2: Create Secret:
+```
+apiVersion: v1
+kind: Secret
+metadata:
+  name: secret-sa-dani
+  annotations:
+    kubernetes.io/service-account.name: "dani-sa"
+type: kubernetes.io/service-account-token
+```
+### Step 3: Define Role
 
 Specifies the permitted actions (read-only for Pods):
 ```yaml
@@ -123,7 +135,7 @@ rules:
   resources: ["pods"]
   verbs: ["get", "list", "watch"]
 ```
-### Step 3: Create RoleBinding
+### Step 4: Create RoleBinding
 
 Connects the Role to the ServiceAccount:
 ```yaml
@@ -146,7 +158,14 @@ This configuration file creates a binding that:
 - **To** the ServiceAccount `dani-sa` 
 - **Within** the `team-a` namespace
   
-### Step 4: Retrieve Authentication Token
+### Step 5: Apply RBAC Resources
+```yaml
+kubectl apply -f role.yaml
+kubectl apply -f rolebinding.yaml
+kubectl apply -f serviceaccount.yaml
+kubectl apply -f secret.yaml
+``` 
+### Step 6: Retrieve Authentication Token
 
 Get the JWT token for the ServiceAccount:
 
@@ -157,7 +176,7 @@ kubectl get secret -n team-a
 # Extract token
 kubectl describe secret dani-sa-token-abc123 -n team-a
 ```
-### Step 5: Generate kubeconfig File
+### Step 7: Generate kubeconfig File
 
 Create a client configuration file:
 
@@ -190,7 +209,7 @@ users:
    - Verifies ServiceAccount exists  
    - Evaluates RBAC permissions  
 
-### Step 6: Usage Instructions for User
+### Step 8: Usage Instructions for User
 1. Save the above configuration in a file named `config`
 2. Instruct user dani to copy this file to `~/.kube/config`:
 
