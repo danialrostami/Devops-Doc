@@ -219,7 +219,7 @@ users:
 kubectl get pods -n team-a
 
 # Test access
-kubectl --kubeconfig=/home/dani/.kube/kubeconfig get pods -n team-a
+kubectl --kubeconfig /home/dani/.kube/kubeconfig get pods -n team-a
 
 # Verify permissions (should show only get/list/watch)
 kubectl auth can-i --as=system:serviceaccount:team-a:dani-sa list pods -n team-a
