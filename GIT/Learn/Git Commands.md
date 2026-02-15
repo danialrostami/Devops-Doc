@@ -313,8 +313,10 @@ git clean -fd                  # Delete files + dirs
 ### Bisect (Find Bugs)
 
 **What it is:** A binary search tool to identify the commit that introduced a bug.
+
 **When to use:** When you know a bug exists but don’t know which commit caused it.
-**How it Work:** It automatically checks out commits between a known "good" commit and a known "bad" commit, letting you test each one until the faulty commit is identified.
+
+**How it Work:** It automatically checks out commits between a known "good" commit and a known "bad" commit, letting you test each one.
 ````bash
 # 1. Start bisecting (assuming current HEAD is bad)
 git bisect start
