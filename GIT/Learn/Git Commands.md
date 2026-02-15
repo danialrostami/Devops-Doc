@@ -364,6 +364,43 @@ git worktree remove ../feature          # Remove worktree
 ````
 
 ---
+### Git Cherry-pick
+allows you to select specific commits from one branch and apply them onto another branch.
+
+``` bash
+# Cherry-pick a single commit
+git cherry-pick a1b2c3d
+
+# Cherry-pick multiple commits (in order)
+git cherry-pick a1b2c3d e4f5g6h i7j8k9l
+
+# Don't automatically create a commit
+git cherry-pick --no-commit <commit-hash>
+
+# Cherry-pick from a specific branch
+git cherry-pick feature-branch~2 feature-branch~1 feature-branch
+```
+
+#### Visual Example:
+* Before cherry-pick
+```
+ main:    A---B---C---D
+          \
+ release:  E---F
+```
+```bash
+git checkout release    #switch to the target branch 
+git cherry-pick C       #cherry-pick commit C from main
+```
+- After cherry-picking commit C to release
+```
+ main:    A---B---C---D
+          \
+ release:  E---F---C'
+```
+--> C' is the cherry-picked commit from main
+
+---
 
 ## 8. Recommended Daily Workflow
 
