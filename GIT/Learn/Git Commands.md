@@ -92,26 +92,74 @@ git checkout main       # Legacy syntax
 ```
 
 ---
-
-### Merge vs Rebase
-
-#### Merge
-
-**Use when:** You want to preserve history.
-
-```bash
-git merge feature-x     # Merge branch into current
+### Git Merge & Rebase
+#### 1) Merge
+Combines another branch into current branch while preserving branch history.
+##### Fast-Forward Merge
+**When:** target branch has no new commits.
+- Happens when main has no new commits since branch was created.
 ```
-
-#### Rebase
-
-**Use when:** You want a clean, linear history.
-
-```bash
-git rebase main         # Replay commits on main
-git rebase -i HEAD~3   # Interactive rebase
+A---B---C main
+         \
+          D---E feature
 ```
+- After merge:
+```
+A---B---C---D---E main
+```
+```bash
+git checkout main          # switch target branch
+git merge feature          # merge branch (fast-forward if possible)
+git merge --ff-only feature  # allow only fast-forward
+```
+##### Merge Commit (ORT strategy)
+Git uses ORT strategy (since Git 2.34) to create a merge commit when histories diverge.
+```
+A---B---C main
+     \
+      D---E feature
+```
+- after merge:
+```
+A---B---C------M main
+     \        /
+      D------E
+```
+##### Squash Merge
+- Combines all feature commits into one commit (no branch history kept).
+```
+git checkout main
+git merge --squash feature
+git commit -m "Add feature"
+```
+```
+A---B---C---S main
+```
+- provide a clean history
 
+**When To Use**
+
+-   Shared branch → **merge**
+-   Private branch → **rebase**
+-   Clean PR → **squash**
+---
+#### 2) Rebase
+- Moves feature commits on top of latest main.
+- You want a clean, linear history
+```
+A---B---C main
+     \
+      D---E feature
+```
+After:
+```
+A---B---C---D'---E' feature
+```
+```
+git checkout feature        # go to working branch
+git rebase main             # replay commits on top
+git rebase -i main          # Interactive rebase
+```
 ---
 
 ### Undoing Changes
