@@ -1,6 +1,6 @@
 ## Practical Git Commands Guide
 
-**well-structured, practical, and GitHub-ready Git reference** focused on *what to use*, *when to use it*, and *why it matters*.
+A collection of **practical Git commands** focused on *what to use*, *when to use it*, and *why it matters*
 
 ---
 
