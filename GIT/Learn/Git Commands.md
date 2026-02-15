@@ -238,13 +238,21 @@ git push -u origin main        # Set upstream
 ---
 
 ## 6. Temporary Work (Stash)
+- saves changes that haven't been committed yet, allowing you to work on something else and come back to your changes later.
+- Need to switch branches but not ready to commit
 
 ```bash
-git stash                      # Save work temporarily
-git stash push -m "msg"       # Named stash
+git stash                    # Stash uncommitted changes
+git stash save "WIP: feature X"  # Stash with a descriptive message
 git stash list                 # List stashes
-git stash apply                # Apply stash
-git stash pop                  # Apply + remove
+
+git stash pop               # Apply last stash and remove it
+git stash apply             # Apply last stash but keep it
+git stash apply stash@{2}   # Apply specific stash
+
+git stash drop stash@{1}    # Delete specific stash
+git stash clear            # Delete all stashes
+git stash branch new-branch # Create branch from stash
 ```
 
 ---
