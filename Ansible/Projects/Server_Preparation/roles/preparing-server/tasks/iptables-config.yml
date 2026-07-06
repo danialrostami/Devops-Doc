@@ -1,0 +1,66 @@
+- name: Check if firewalld package is installed (on RHEL).
+  command: yum list installed firewalld
+  register: firewalld_installed
+  ignore_errors: true
+  changed_when: false
+  when:
+    - ansible_os_family == "RedHat"
+    - firewall_disable_firewalld
+  check_mode: false
+
+- name: Disable the firewalld service (on RHEL, if configured).
+  service:
+    name: firewalld
+    state: stopped
+    enabled: false
+  when:
+    - ansible_os_family == "RedHat"
+    - firewall_disable_firewalld
+    - firewalld_installed.rc == 0
+
+- name: Check if ufw package is installed (on Ubuntu).
+  command: service ufw status
+  register: ufw_installed
+  ignore_errors: true
+  changed_when: false
+  when:
+    - ansible_distribution == "Ubuntu"
+  check_mode: false
+
+    #- name: Disable the ufw firewall (on Ubuntu, if configured).
+    #service:
+    # name: ufw
+    # state: stopped
+    # enabled: false
+- name: Stop and Disable ufw service if started
+  ansible.builtin.service:
+    name: ufw
+    state: stopped
+    enabled: no
+  when:
+    - ansible_distribution == "Ubuntu"
+
+- name: Config iptable template
+  template:
+    src: iptables.j2
+    dest: "{{ iptables.v4_config_path }}"
+      #user: root
+      #group: root
+      #mode: "0644"
+  notify: Restart iptables
+
+    #- name: Ensure iptbales service is enable and started
+    #service:
+    #name: "{{ iptables.service_name }}"
+    #enabled: yes
+    #state: started
+    #changed_when: false
+
+- name: restore iptables state from a file
+  community.general.iptables_state:
+    state: restored
+    path: "{{ iptables.v4_config_path }}"
+    noflush: true
+  notify: Restart iptables
+
+

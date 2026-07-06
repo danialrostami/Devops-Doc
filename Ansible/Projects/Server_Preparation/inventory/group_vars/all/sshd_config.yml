@@ -1,0 +1,18 @@
+# sshd configuration
+sshd_config:
+  #Port: "{{ ansible_port }}"
+  Port: 22
+  ListenAddress: 0.0.0.0
+    #PermitRootLogin: without-password
+  AuthenticationMethods: 
+    - publickey
+    - password
+  PubkeyAuthentication: "yes"  
+  PermitRootLogin: "without-password"
+  PasswordAuthentication: "yes"
+  AllowUsers: 
+    - root
+    - danial  
+  AllowGroups: 
+    - root
+    - danial  

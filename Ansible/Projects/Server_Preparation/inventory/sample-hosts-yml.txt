@@ -1,0 +1,25 @@
+all:
+  children:
+    repo-servers:		#group-name
+      hosts:
+        repo-server:		# name of hosts in group
+          ansible_host: 94.101.184.85
+          ansible_user: root
+          ansible_port: 8090
+        
+        tools-server:		# name of hosts in group
+	  ansible_host: 94.101.184.85
+          ansible_user: root
+          ansible_port: 8090
+
+    monitoring_server:		# group-name
+      hosts:
+         monitoring-DB:		# name of hosts in group
+           ansible_host:
+           anisble_user: root
+           ansible_port: 22
+    
+         monitoring-front:	# name of hosts in group
+           ansible_host: 22
+           ansible_user: root
+           ansible_port: 8090

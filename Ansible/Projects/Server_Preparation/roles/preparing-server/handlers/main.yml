@@ -1,0 +1,9 @@
+- name: Restart ssh
+  systemd:
+    name: "{{ 'ssh' if ansible_os_family == 'Debian' else 'sshd' }}"
+    state: restarted
+
+- name: Restart iptables
+  systemd:
+    name: "{{ iptables.service_name }}"
+    state: restarted

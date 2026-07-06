@@ -1,0 +1,22 @@
+# Debian packages list
+Debian_packages:
+ - wget
+ - curl
+ - bash-completion
+ - git
+ - vim
+ - htop
+ - net-tools  
+ - iptables-persistent  
+
+# Redhat packages list   
+Redhat_packages:
+- wget
+- curl
+- bash-completion
+- telnet
+- git
+- tree
+- htop
+- iptables-services
+- iptables-utils

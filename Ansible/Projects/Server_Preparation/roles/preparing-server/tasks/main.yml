@@ -1,0 +1,21 @@
+---
+# tasks file for preparing-server
+- name: update Debian and Redhat Servers
+  import_tasks: update-packages.yml
+  tags: update_servers
+
+- name: install basic tools
+  import_tasks: install-packages.yml
+  tags: install_packages
+
+- name: config iptable
+  import_tasks: iptables-config.yml
+  tags: firewall, hardening
+ 
+- name: config sshd
+  import_tasks: ssh-config.yml
+  tags: ssh, hardening  
+
+- name: change resolv.conf
+  import_tasks: resolveconf.yml
+  tags: dns, hardening

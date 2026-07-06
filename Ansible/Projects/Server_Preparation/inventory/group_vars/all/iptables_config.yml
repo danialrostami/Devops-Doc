@@ -1,0 +1,19 @@
+iptables:
+  v4_config_path: "{{ '/etc/iptables/rules.v4' if ansible_os_family == 'Debian' else '/etc/sysconfig/iptables' }}"
+  service_name: "{{ 'iptables' if ansible_os_family == 'Debian' else 'iptables' }}" 
+  network_adapter_access:
+    - lo
+  
+  ssh_port: 22
+  tcp_port_access:
+     - 80
+     - 443
+     - 2022  
+
+  #udp_port_access:
+  
+       #  trusted_IP:
+       #    - 87.247.187.145
+  
+       #  trusted_Range:
+       #    - 10.60.10.0/24

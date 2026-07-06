@@ -1,0 +1,8 @@
+---
+- hosts: train-servers
+  become: true
+  gather_facts: yes
+  name: prepare Linux servers
+  roles:
+  # preparing server and hardening
+    - { role: roles/preparing-server, become: True, tags: preparing_server }

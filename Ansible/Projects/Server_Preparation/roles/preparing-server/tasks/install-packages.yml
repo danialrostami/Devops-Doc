@@ -1,0 +1,16 @@
+---
+- name: Install Basic Ubuntu packages
+  apt:
+    name: "{{ item }}"
+    state: present
+    force_apt_get: yes
+    update_cache: yes
+  with_items: "{{ Debian_packages }}"
+  when: ansible_os_family == "Debian"
+
+- name: Install Basic Redhat packages
+  yum:
+    name: "{{ item }}"
+    state: present
+  with_items: "{{ Redhat_packages }}"
+  when: ansible_os_family == "Redhat"

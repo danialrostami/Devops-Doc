@@ -1,0 +1,7 @@
+dns1: 192.168.37.2
+dns2: 8.8.8.8
+
+  #dns: 192.168.37.2 8.8.8.8
+  #fallback_dns: 1.1.1.1 4.2.2.4
+  #dnssec: allow-downgrade
+  #dns_over_tls: opportunistic

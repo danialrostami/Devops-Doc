@@ -1,0 +1,13 @@
+---
+- name: update Redhat servers
+  yum:
+    name: "*"
+    state: latest
+  when: ansible_os_family == "RedHat"
+
+
+- name: Update and upgrade apt packages in Debians
+  apt:
+    upgrade: yes
+    update_cache: yes
+    cache_valid_time: 86400
