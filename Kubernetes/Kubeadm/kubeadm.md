@@ -317,7 +317,7 @@ Run on Master 1, `192.168.37.13`:
 sudo kubeadm config images pull
 ```
 
-If you need to pull images manually, the source note includes:
+If you need to pull images manually:
 
 ```bash
 sudo crictl pull registry.k8s.io/google_containers/etcd:3.5.16-0
@@ -348,7 +348,7 @@ For this topology, use:
 192.168.37.10:6443
 ```
 
-#### Alternative public-registry initialization command from the source note
+#### Alternative public-registry initialization 
 
 ```bash
 kubeadm init \
@@ -359,7 +359,7 @@ kubeadm init \
   --upload-certs
 ```
 
-If HAProxy is not configured, the source note allows using the IP address of the master itself:
+If HAProxy is not configured, you can use the IP address of the master itself:
 
 ```text
 --control-plane-endpoint <IP of Master>:6443
@@ -467,7 +467,7 @@ On a host with Internet access, pull the images first:
 sudo kubeadm config images pull
 ```
 
-The following image list is preserved exactly from the source note:
+Tag and Push images to registry:
 
 ```bash
 for image in \
@@ -488,8 +488,6 @@ done
 ```
 
 For this topology, replace `<IP_Registry>` with `192.168.37.13`.
-
-> The source note contains two different image sets. The image versions must match the Kubernetes version used by `kubeadm`; do not mix the sets unintentionally.
 
 ### 9.3 Configure containerd to Use the Private Registry
 
@@ -603,7 +601,8 @@ sed -i 's|docker.io/flannel/|192.168.37.13:5000/flannel/|g' kube-flannel.yml
 sed -i 's|ghcr.io/flannel-io/|192.168.37.13:5000/flannel/|g' kube-flannel.yml
 ```
 
-The source note also includes this optional CIDR replacement command:
+- Optional: If using a specific network CIDR (default is 10.244.0.0/16 which matches your kubeadm init)
+- - You can also modify the network if needed:
 
 ```bash
 sed -i 's|10.244.0.0/16|10.244.0.0/16|g' kube-flannel.yml
