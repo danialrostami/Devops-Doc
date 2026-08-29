@@ -289,25 +289,61 @@ mongosh --host=192.168.1.50 --port=27017 \
   sampledb
 ```
 
-## 4.2 Basic Shell Commands
-
-```javascript
-show dbs;            // List all databases
-
-use sampledb;        // Switch to the "sampledb" database
-
-help                 // Show shell help
-
-show collections     // List all collections in the current database
-```
-
-## 4.3 Database & Collection Statistics
+## 4.2 Database & Collection Statistics
 
 **Show all databases (size overview):**
 
 ```javascript
 show dbs
 ```
+
+### 🛠️ CRUD Operations (Database & Collection)
+
+**1. Database Operations:**
+* **Create/Switch to a Database:**
+  *(In MongoDB, a database is created automatically when you first insert data into it)*
+  ```javascript
+  use <Database_Name>
+  ```
+* **Drop (Remove) a Database:**
+  ```javascript
+  db.dropDatabase()
+  ```
+
+**2. Collection Operations:**
+* **Create a Collection:**
+  ```javascript
+  db.createCollection("<Collection_Name>")
+  ```
+* **List all Collections in current DB:**
+  ```javascript
+  show collections
+  ```
+* **Drop (Remove) a Collection:**
+  ```javascript
+  db.<Collection_Name>.drop()
+  ```
+* **Rename a Collection:**
+  ```javascript
+  db.<Collection_Name>.renameCollection("<New_Collection_Name>")
+  ```
+
+**3. Document Operations (Quick Reference):**
+* **Insert one document:**
+  ```javascript
+  db.<Collection_Name>.insertOne({ "field": "value" })
+  ```
+* **Update a document:**
+  ```javascript
+  db.<Collection_Name>.updateOne(
+    { "<Query_Field>": "<Query_Value>" }, 
+    { "$set": { "<Update_Field>": "<New_Value>" } }
+  )
+  ```
+* **Delete a document:**
+  ```javascript
+  db.<Collection_Name>.deleteOne({ "<Query_Field>": "<Query_Value>" })
+  ```
 
 **Stats for a specific collection (sizes in GB):**
 
@@ -347,7 +383,7 @@ db.orders.stats()
 
 > **Estimating dump size:** `size` is in bytes. In the sample above, `314,887,163,344` bytes ≈ **293 GB**, so you need **at least ~300 GB** of free disk space on the machine where you run the dump.
 
-## 4.4 Indexing Strategy
+## 4.3 Indexing Strategy
 
 **List current indexes:**
 
@@ -369,7 +405,7 @@ db.orders.createIndex(
 - **Disk space:** Building a new index requires temporary space for sorting, in addition to the final index file. Make sure the database drive has enough free space — **at least 20–30% of the collection's `storageSize`** must be free on the database partition.
 - **RAM / index size:** Ideally, all indexes should fit in RAM to keep read/write performance high. If the total `totalIndexSize` after building new indexes exceeds the WiredTiger cache size (usually **50% of the server's RAM**), the database will suffer from **Disk Thrashing** (severe performance degradation).
 
-## 4.5 User Management
+## 4.4 User Management
 
 **List users defined in a specific database (with roles):**
 
