@@ -1,6 +1,6 @@
-# MongoDB DevOps Runbook (Integrated)
+# MongoDB DevOps Runbook 
 
-- A comprehensive, production-ready guide for deploying, configuring, managing, backing up, and restoring MongoDB instances.
+- A comprehensive guide for deploying, configuring, managing, backing up, and restoring MongoDB instances.
 
 **Sample values used throughout this document:**
 
